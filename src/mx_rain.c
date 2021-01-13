@@ -1,75 +1,78 @@
-#include "header.h"
+#include "../inc/mx_rain.h"
 
-void mx_rain() {
-    initscr();
-    mx_initcolor();
-    
-    int max_y = 0, max_x = 0;    
-    getmaxyx(stdscr, max_y, max_x);
-    int start[max_x];
-    int lenght[max_x];
-    int arr[max_x];
+void mx_rain(){
+	initscr();
+	curs_set(0); // invisible cursor
+	mx_initcolor(); // intialize some basic colors
 
-    for (int i = 0; i < max_x; i++) {
-        start[i] = -1 * (rand() % 80);
-        arr[i] = start[i];
-        lenght[i] = rand() % 50  - 1;
-    }
+	int row, col;
+	getmaxyx(stdscr, row, col);
 
-    int speed = 100;
-    int color = 1;
-    bool check = true;
-    while (check) {
-        for (int i = 0; i < max_x; i++) {       
-            wchar_t random_char = (rand() % 93 + 33);
-            if (i % 2 == 0) {
-                random_char = ' ';
-            }
-            mvaddch(arr[i] + 1, i, random_char | COLOR_PAIR(2));      
-            mvaddch(arr[i], i, random_char | COLOR_PAIR(color));
-            mvaddch(arr[i] - lenght[i], i, ' ' | COLOR_PAIR(color));
-            if (arr[i] - lenght[i] > max_y) {
-                arr[i] = start[i];
-            }
-            arr[i]++;
-        }
+	int text_begin[col];
+	int text_len[col];
+	int text_out[col];
 
-        usleep(1000 * speed);
-        nodelay(stdscr,TRUE);
-        noecho();
-        char ch = getch();
-        switch (ch) {
-            case 'q':
-                check = false;
-                clear();
-			    break;
-            case '+':
-                if (speed > 1) {
-                    if (speed <= 11)
-                        speed--;
-                    else
-                        speed -= 10;
-                }
-                break;
-            case '-':
-                if (speed < 300) {
-                    if (speed <= 10)
-                            speed++;
-                        else
-                            speed += 10;
-                }
-                break;
-            case '1': color = 1; break;
-            case '2': color = 2; break;
-            case '3': color = 3; break;
-            case '4': color = 4; break;
-            case '5': color = 5; break;
-            case '6': color = 6; break;
-            case '7': color = 7; break;
-            case '8': color = 8; break;
-        }
-        refresh();
-    }
+	srand(time(0));
 
-    endwin();
+	for(int i = 1; i < col; i += 2){
+		text_len[i] = rand() % row - 1;
+		text_begin[i] = -1 * (rand() % (col / 2)); // '* (-1)' - begin text from top of the screen
+		text_out[i] = text_begin[i];
+	}
+
+	short temp_color = 1; // green and black by default
+
+	short wb = 2; // white and black
+
+	int speed = 100;
+	bool run = true;
+	while(run){
+		for(int i = 1; i < col; i += 2){
+			wchar_t wc = (rand() % 93 + 33);
+
+			attron(COLOR_PAIR(wb));
+			mvwaddch(stdscr, text_out[i] + 1, i, wc);
+			attroff(COLOR_PAIR(wb));
+			
+			attron(COLOR_PAIR(temp_color));
+			mvwaddch(stdscr, text_out[i], i, wc);
+
+			mvwaddch(stdscr, text_out[i] - text_len[i], i, ' ');
+			attroff(COLOR_PAIR(temp_color));
+
+			if(text_out[i] - text_len[i] > row) 
+				text_out[i] = text_begin[i];
+
+			text_out[i]++;
+		}
+
+		usleep(1000 * speed);
+		nodelay(stdscr, TRUE);
+		noecho();
+
+		char c = getch();
+		switch(c){
+			case 'q':
+				run = false;
+				clear();
+				break;
+			case 'f':	
+				if(speed > 10) speed -= 10;
+				break;
+			case 's': 
+				if(speed < 200) speed += 10;
+				break;
+			case 'g': temp_color = 1; break;
+            case 'w': temp_color = 2; break;
+            case 'r': temp_color = 3; break;
+            case 'b': temp_color = 4; break;
+            case 'y': temp_color = 5; break;
+		}
+		refresh();
+	}
+
+	endwin();
 }
+
+
+

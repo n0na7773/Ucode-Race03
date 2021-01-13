@@ -1,9 +1,22 @@
-CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic -lncurses
+NAME = matrix_rain
 
-all: MINILIBMX
-MINILIBMX: src/*.c inc/*.h
-	clang $(CFLAGS) -o matrix_rain src/*.c -I inc
+SRC_FILES = $(wildcard src/*.c)
+INC_FILES = $(wildcard inc/*.h)
+
+CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic -lncurses -o $(NAME)
+
+all: install
+
+install: $(NAME)
+
+$(NAME): $(SRC_FILES)
+	clang $(CFLAGS) $(SRC_FILES)
+
 clean:
-	rm -rf matrix_rain
+	@rm -rf $(NAME)
+
 uninstall: clean
+
 reinstall: uninstall all
+
+.PHONY: all uninstall clean reinstall

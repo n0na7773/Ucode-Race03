@@ -1,10 +1,8 @@
-#include "header.h"
+#include "../inc/mx_rain.h"
 
-int mx_strlen(const char *s) {
-    int count = 0; 
-
-    if (!s) return 0;
-    while (s[count] != '\0') count++;
-
-    return count;
+int mx_strlen(const char *s){
+    int len = 0;
+    while(*s != 0){s++; len++;}
+    return len;
 }
+
